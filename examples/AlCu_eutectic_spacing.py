@@ -6,8 +6,8 @@ PROJECT_ROOT = os.path.abspath(os.path.join(
 )
 sys.path.append(PROJECT_ROOT)
 
-import mist
-import ramen
+import mistlib as mist
+import ramenlib as ramen
 
 # Create from the AlCu JSON file
 path_to_example_data = os.path.join(os.path.dirname(__file__), 'AlCu.json')

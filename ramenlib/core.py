@@ -1,4 +1,4 @@
-import mist
+import mistlib as mist
 import numpy as np
 
 def get_P_JH(g, n_max = 10000):

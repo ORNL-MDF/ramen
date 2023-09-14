@@ -6,7 +6,8 @@ Ramen is a Python library for inexpensive analytic and semi-analytic models for 
 ## Installing Ramen
 ```
 $ git clone https://code.ornl.gov/ramen/ramen
-$ pip install ramen
+$ cd ramen
+$ pip install .
 ```
 
 ## Running the example
