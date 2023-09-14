@@ -63,6 +63,38 @@
                 "reference": "O. Sinninger, M. Peters, P.W. Voorhees, Two-Phase Eutectic Growth in Al-Cu and Al-Cu-Ag, Metallurgical and Materials Transactions A, Vol. 49A, pp. 1692-1707, 2018.",
                 "uncertainty": "None",
                 "print_symbol": "$C^{E}$"
+            },
+            "taylor_factor" : {
+                "print_name": "Taylor factor",
+                "value": 3.06,
+                "unit": "None",
+                "reference": "Zhou, L., Huynh, T., Park, S. et al. Laser powder bed fusion of Al–10 wt% Ce alloys: microstructure and tensile property. J Mater Sci 55, 14611–14625 (2020). https://doi.org/10.1007/s10853-020-05037-z",
+                "uncertainty": "None",
+                "print_symbol": "$M_{T}$"
+            },
+            "shear_modulus_base_element" : {
+                "print_name": "Shear modulus (base element)",
+                "value": 25.4e9,
+                "unit": "Pa",
+                "reference": "Zhou, L., Huynh, T., Park, S. et al. Laser powder bed fusion of Al–10 wt% Ce alloys: microstructure and tensile property. J Mater Sci 55, 14611–14625 (2020). https://doi.org/10.1007/s10853-020-05037-z",
+                "uncertainty": "None",
+                "print_symbol": "$G$"
+            },
+            "burgers_vector_base_element" : {
+                "print_name": "Burgers vector (base element)",
+                "value": 0.286e-9,
+                "unit": "m",
+                "reference": "Zhou, L., Huynh, T., Park, S. et al. Laser powder bed fusion of Al–10 wt% Ce alloys: microstructure and tensile property. J Mater Sci 55, 14611–14625 (2020). https://doi.org/10.1007/s10853-020-05037-z",
+                "uncertainty": "None",
+                "print_symbol": "$b$"
+            },
+            "poisson_ratio_base_element" : {
+                "print_name": "Poisson's ratio (base element)",
+                "value": 0.34,
+                "unit": "None",
+                "reference": "Zhou, L., Huynh, T., Park, S. et al. Laser powder bed fusion of Al–10 wt% Ce alloys: microstructure and tensile property. J Mater Sci 55, 14611–14625 (2020). https://doi.org/10.1007/s10853-020-05037-z",
+                "uncertainty": "None",
+                "print_symbol": "$\\nu$"
             }
         },
         "theta" : {

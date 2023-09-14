@@ -1,6 +1,11 @@
 import mistlib as mist
 import numpy as np
 
+# --------------------------------------------------------------------------------
+# Jackson-Hunt model for lamellar spacing for eutectic solidification
+# Model taken from: 
+# Dantzig and Rappaz, Solidification, Chapter 9, EPFL Press, 2017.
+# --------------------------------------------------------------------------------
 def get_P_JH(g, n_max = 10000):
     sum = 0.0
     for n in range(1,n_max):
@@ -48,8 +53,65 @@ def get_eutectic_lamellar_spacing(mat, velocity, c_avg, phases):
     g_alpha = (c_avg - c_e_beta)/(c_e_alpha - c_e_beta)
     g_beta = 1.0 - g_alpha  
 
+    # Save the volume fractions to the mist object
+    prop_g_alpha = mist.core.Property(name = "phase_volume_fraction", unit = "None", value = g_alpha, print_name = "Phase volume fraction", reference = 'Calcuated in Ramen', print_symbol = "$g$")
+
+    prop_g_beta = mist.core.Property(name = "phase_volume_fraction", unit = "None", value = g_alpha, print_name = "Phase volume fraction", reference = 'Calcuated in Ramen', print_symbol = "$g$")
+
+    mat.solidification_microstructure['phase_fractions'] = {}
+    mat.solidification_microstructure['phase_fractions'][phases[0]] = prop_g_alpha
+    mat.solidification_microstructure['phase_fractions'][phases[1]] = prop_g_beta
+
+
     AC = get_AC_JH(delta_c_e, g_alpha, g_beta, m_lalpha, m_lbeta)
     AR = get_AR_JH(gamma_alphal, theta_alpha, m_lalpha, g_alpha, gamma_betal, theta_beta, m_lbeta, g_beta)
 
     spacing = np.sqrt(AR * Dl /(AC * velocity))
+
+    # Save the spacing in the mist object
+    property = mist.core.Property(name = "eutectic_lamellar_spacing", unit = "m", value = spacing, print_name = "Eutectic lamellar spacing", reference = 'Calcuated in Ramen', print_symbol = "$\\lambda")
+    mat.solidification_microstructure['eutectic_lamellar_spacing'] = property
+
     return spacing
+
+# --------------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------------
+# Orowan model for strengthening due to lamella from eutectic solidification
+# Model taken from: 
+# Zhou, L., Huynh, T., Park, S. et al. Laser powder bed fusion of Al–10 wt% Ce 
+# alloys: microstructure and tensile property. J Mater Sci 55, 14611–14625 (2020). 
+# https://doi.org/10.1007/s10853-020-05037-z
+# --------------------------------------------------------------------------------
+
+def get_orowan_strengthening_lamella(mat, matrix_phase, secondary_phase):
+    # First, get the material properties
+
+    # Taylor factor
+    M = mat.phase_properties[matrix_phase].properties['taylor_factor'].value
+
+    # Shear modulus of the base element of the matrix
+    G = mat.phase_properties[matrix_phase].properties['shear_modulus_base_element'].value
+
+    # Burgers vector
+    b = mat.phase_properties[matrix_phase].properties['burgers_vector_base_element'].value
+
+    # Poisson ratio
+    poisson_ratio = mat.phase_properties[matrix_phase].properties['poisson_ratio_base_element'].value
+
+    # Eutectic spacing
+    eutectic_spacing = mat.solidification_microstructure['eutectic_lamellar_spacing'].value
+
+    # Secondary phase fraction
+    g_secondary = mat.solidification_microstructure['phase_fractions'][secondary_phase].value
+
+    # Now calculate the effective radius of the secondary phase
+    R = eutectic_spacing / (np.sqrt(3.0 * np.pi / (4.0 * g_secondary) - 1.64))
+
+    # Finally calculate the strengthening
+    orowan_strengthening_lamella = M * 0.4 * G * b / (np.pi * np.sqrt(1-poisson_ratio)) * np.log(2.0*R/b) / eutectic_spacing
+
+    return orowan_strengthening_lamella
+
+
+# --------------------------------------------------------------------------------

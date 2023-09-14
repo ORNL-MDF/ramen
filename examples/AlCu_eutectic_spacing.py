@@ -18,3 +18,8 @@ c_avg = 2.9 # at. %
 phases = ['alpha', 'theta']
 spacing = ramen.get_eutectic_lamellar_spacing(mat, velocity, c_avg, phases)
 print("Lamellar spacing: ", spacing*1.e9, "nm")
+
+matrix_phase = 'alpha'
+secondary_phase = 'theta'
+orowan_strengthening_lamella = ramen.get_orowan_strengthening_lamella(mat, matrix_phase, secondary_phase)
+print("Orowan strengthening, eutectic lamella:", orowan_strengthening_lamella * 1e-6, "MPa")
