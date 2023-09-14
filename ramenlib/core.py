@@ -23,7 +23,9 @@ def get_AC_JH(delta_C_0, g_alpha, g_beta, m_lalpha, m_lbeta):
     AC = delta_C_0/(g_alpha * g_beta) * np.abs(m_lalpha) * np.abs(m_lbeta) / (np.abs(m_lalpha) + np.abs(m_lbeta) ) * P_g_alpha
     return AC
 
-def get_eutectic_lamellar_spacing(mat, velocity, c_avg, phases):
+def get_eutectic_lamellar_spacing(mat, phases):
+    # TODO: This needs to check that the material is a binary alloy
+
     # Get the diffusivity
     solute_diffusivities = mat.phase_properties['liquid'].properties['solute_diffusivities']
     key = list(solute_diffusivities.keys())[0]
@@ -48,6 +50,13 @@ def get_eutectic_lamellar_spacing(mat, velocity, c_avg, phases):
 
     theta_alpha = theta_alpha * 2.0*np.pi/360.0
     theta_beta = theta_beta * 2.0*np.pi/360.0
+
+    # Get the solidification velocity
+    velocity = mat.solidification_conditions['solidification_velocity'].value
+
+    # Get the average composition
+    key = mat.composition['solute_elements'][0]
+    c_avg = mat.composition[key].value
 
     
     g_alpha = (c_avg - c_e_beta)/(c_e_alpha - c_e_beta)
