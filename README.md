@@ -5,6 +5,11 @@ Ramen is a Python library for inexpensive analytic and semi-analytic models for 
 
 ## Installing Ramen
 ```
+# First install mist
+$ git clone https://code.ornl.gov/mist/mist
+$ cd mist
+$ pip install .
+# Now install ramen
 $ git clone https://code.ornl.gov/ramen/ramen
 $ cd ramen
 $ pip install .
