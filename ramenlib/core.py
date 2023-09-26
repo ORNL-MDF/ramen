@@ -7,10 +7,14 @@ import numpy as np
 # Dantzig and Rappaz, Solidification, Chapter 9, EPFL Press, 2017.
 # --------------------------------------------------------------------------------
 def get_P_JH(g, n_max = 10000):
-    sum = 0.0
-    for n in range(1,n_max):
-        sum = sum + np.sin(n*np.pi*g)**2 / ( (n*np.pi)**3 )
-    return sum    
+    # The semianalytic part of of the Jackson-Hunt model is the evaluation of this
+    # infinite sum. Emprically, it seems like 10,000 terms is enough for the 
+    # result to converge. This sum is the slowest part of the calculation by far.
+    # Potentially we could cache P for various values of g if we really need better
+    # performance.
+
+    n = np.arange(1, n_max)
+    return np.sum(np.sin(n*np.pi*g)*np.sin(n*np.pi*g) / ((n*np.pi)*(n*np.pi)*(n*np.pi)))
 
 def get_AR_JH(gamma_alphal, theta_alpha, m_lalpha, g_alpha, gamma_betal, theta_beta, m_lbeta, g_beta):
     term_alpha = 2.0*gamma_alphal * np.cos(theta_alpha)/(np.abs(m_lalpha) * g_alpha)
