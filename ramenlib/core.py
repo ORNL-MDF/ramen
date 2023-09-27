@@ -95,6 +95,9 @@ def get_eutectic_lamellar_spacing(mat, phases):
 # Zhou, L., Huynh, T., Park, S. et al. Laser powder bed fusion of Al–10 wt% Ce 
 # alloys: microstructure and tensile property. J Mater Sci 55, 14611–14625 (2020). 
 # https://doi.org/10.1007/s10853-020-05037-z
+#
+# Michi, R. A., Sisco, K., Bahl, S. et al. Microstructural evolution and strengthening mechanisms in a heat-treated additively manufactured Al–Cu–Mn–Zr alloy. Mater. Sci. Eng. A, 840, 142928 (2022). 
+# https://doi.org/10.1016/j.msea.2022.142928
 # --------------------------------------------------------------------------------
 
 def get_orowan_strengthening_lamella(mat, matrix_phase, secondary_phase):
@@ -126,5 +129,69 @@ def get_orowan_strengthening_lamella(mat, matrix_phase, secondary_phase):
 
     return orowan_strengthening_lamella
 
+# --------------------------------------------------------------------------------
 
 # --------------------------------------------------------------------------------
+# Solid solution strengthening
+# Model taken from: 
+# Michi, R. A., Sisco, K., Bahl, S. et al. Microstructural evolution and strengthening 
+# mechanisms in a heat-treated additively manufactured Al–Cu–Mn–Zr alloy. Mater. Sci. Eng. A, 840, 142928 (2022). 
+# https://doi.org/10.1016/j.msea.2022.142928
+# --------------------------------------------------------------------------------
+def get_solid_solution_strengthening(mat, matrix_phase):
+    # NOTE: For now assume a binary alloy
+
+    # First, get the material properties
+
+    # Taylor factor
+    M = mat.phase_properties[matrix_phase].properties['taylor_factor'].value
+
+    # Shear modulus of the base element of the matrix
+    G = mat.phase_properties[matrix_phase].properties['shear_modulus_base_element'].value
+
+    # Burgers vector
+    b = mat.phase_properties[matrix_phase].properties['burgers_vector_base_element'].value
+
+    # Poisson ratio
+    poisson_ratio = mat.phase_properties[matrix_phase].properties['poisson_ratio_base_element'].value
+
+    # Solute misfit strain
+    solute_misfits = mat.phase_properties[matrix_phase].properties['solute_misfit_strains']
+    key = list(solute_misfits.keys())[0]
+    solute_misfit = solute_misfits[key].value
+
+    # Average matrix composition (I assume this is the same as the solubility limit of the matrix phase)
+    c_matrix = mat.phase_properties[matrix_phase].properties['solubility_limit'].value
+    c_matrix_fraction = 0.01 * c_matrix
+
+    # Now calculate the solid solution strengthening
+    w = 5.0 * b
+
+    ss_strengthening = M * (3./8.)**(2./3.) * ((1.+poisson_ratio)/(1.-poisson_ratio))**(4./3.) \
+                        * (w/b)**(1./3.) * G * np.abs(solute_misfit)**(4./3.) * c_matrix_fraction**(2./3.)
+
+    return ss_strengthening
+# --------------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------------
+# Grain boundary strengthening via the Hall-Petch effect
+# Model taken from: 
+# Michi, R. A., Sisco, K., Bahl, S. et al. Microstructural evolution and strengthening 
+# mechanisms in a heat-treated additively manufactured Al–Cu–Mn–Zr alloy. Mater. Sci. Eng. A, 840, 142928 (2022). 
+# https://doi.org/10.1016/j.msea.2022.142928
+# --------------------------------------------------------------------------------
+def get_grain_boundary_strengthening(mat):
+    # First, get the material properties
+
+    # Hall-Petch coefficient
+    k_HP = mat.properties['hall_petch_coefficient'].value
+
+    # Average grain diameter
+    d = mat.grain_microstructure['average_grain_diameter'].value
+
+    # Now calculate the grain boundary strengthening
+    gb_strengthening = k_HP / np.sqrt(d)
+
+    return gb_strengthening
+# --------------------------------------------------------------------------------
+
