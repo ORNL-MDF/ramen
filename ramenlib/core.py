@@ -69,7 +69,7 @@ def get_eutectic_lamellar_spacing(mat, phases):
     # Save the volume fractions to the mist object
     prop_g_alpha = mist.core.Property(name = "phase_volume_fraction", unit = "None", value = g_alpha, print_name = "Phase volume fraction", reference = 'Calcuated in Ramen', print_symbol = "$g$")
 
-    prop_g_beta = mist.core.Property(name = "phase_volume_fraction", unit = "None", value = g_alpha, print_name = "Phase volume fraction", reference = 'Calcuated in Ramen', print_symbol = "$g$")
+    prop_g_beta = mist.core.Property(name = "phase_volume_fraction", unit = "None", value = g_beta, print_name = "Phase volume fraction", reference = 'Calcuated in Ramen', print_symbol = "$g$")
 
     mat.solidification_microstructure['phase_fractions'] = {}
     mat.solidification_microstructure['phase_fractions'][phases[0]] = prop_g_alpha

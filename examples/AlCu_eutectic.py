@@ -16,7 +16,7 @@ mat = mist.core.MaterialInformation(path_to_example_data)
 
 # User-set parameters
 velocity = 1.3 # m/s
-c_Cu = 2.55 # at. %
+c_Cu = 2.6 # at. %
 grain_diameter = 5.0e-6 # m
 
 # Set the velocity, average composition, and average grain size
