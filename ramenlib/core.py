@@ -27,7 +27,7 @@ def get_AC_JH(delta_C_0, g_alpha, g_beta, m_lalpha, m_lbeta):
     AC = delta_C_0/(g_alpha * g_beta) * np.abs(m_lalpha) * np.abs(m_lbeta) / (np.abs(m_lalpha) + np.abs(m_lbeta) ) * P_g_alpha
     return AC
 
-def get_eutectic_lamellar_spacing(mat, phases):
+def get_eutectic_lamellar_spacing(mat, phases, phase_fractions, solidification_velocity):
     # TODO: This needs to check that the material is a binary alloy
 
     # Get the diffusivity
@@ -55,37 +55,41 @@ def get_eutectic_lamellar_spacing(mat, phases):
     theta_alpha = theta_alpha * 2.0*np.pi/360.0
     theta_beta = theta_beta * 2.0*np.pi/360.0
 
-    # Get the solidification velocity
-    velocity = mat.solidification_conditions['solidification_velocity'].value
-
-    # Get the average composition
-    key = mat.composition['solute_elements'][0]
-    c_avg = mat.composition[key].value
-
-    
-    g_alpha = (c_avg - c_e_beta)/(c_e_alpha - c_e_beta)
-    g_beta = 1.0 - g_alpha  
-
-    # Save the volume fractions to the mist object
-    prop_g_alpha = mist.core.Property(name = "phase_volume_fraction", unit = "None", value = g_alpha, print_name = "Phase volume fraction", reference = 'Calcuated in Ramen', print_symbol = "$g$")
-
-    prop_g_beta = mist.core.Property(name = "phase_volume_fraction", unit = "None", value = g_beta, print_name = "Phase volume fraction", reference = 'Calcuated in Ramen', print_symbol = "$g$")
-
-    mat.solidification_microstructure['phase_fractions'] = {}
-    mat.solidification_microstructure['phase_fractions'][phases[0]] = prop_g_alpha
-    mat.solidification_microstructure['phase_fractions'][phases[1]] = prop_g_beta
-
+    # Calculate the eutectic phase fractions
+    g_alpha = phase_fractions[phases[0]]
+    g_beta = phase_fractions[phases[1]]  
 
     AC = get_AC_JH(delta_c_e, g_alpha, g_beta, m_lalpha, m_lbeta)
     AR = get_AR_JH(gamma_alphal, theta_alpha, m_lalpha, g_alpha, gamma_betal, theta_beta, m_lbeta, g_beta)
 
-    spacing = np.sqrt(AR * Dl /(AC * velocity))
-
-    # Save the spacing in the mist object
-    property = mist.core.Property(name = "eutectic_lamellar_spacing", unit = "m", value = spacing, print_name = "Eutectic lamellar spacing", reference = 'Calcuated in Ramen', print_symbol = "$\\lambda")
-    mat.solidification_microstructure['eutectic_lamellar_spacing'] = property
+    # Calculate the spacing
+    spacing = np.sqrt(AR * Dl /(AC * solidification_velocity))
 
     return spacing
+
+# --------------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------------
+# Lever rule for eutectic phase fractions
+# Model taken from: 
+# Dantzig and Rappaz, Solidification, Chapter 9, EPFL Press, 2017.
+# --------------------------------------------------------------------------------
+
+def get_eutectic_phase_fractions(mat, phases, solute_composition):
+     # Get the solubility limits
+    c_e_alpha = mat.phase_properties[phases[0]].properties['solubility_limit'].value
+    c_e_beta = mat.phase_properties[phases[1]].properties['solubility_limit'].value
+
+    # Calculate the eutectic phase fractions
+    g_alpha = (solute_composition - c_e_beta)/(c_e_alpha - c_e_beta)
+    g_beta = 1.0 - g_alpha  
+
+    eutectic_phase_fractions = {}
+    eutectic_phase_fractions[phases[0]] = g_alpha
+    eutectic_phase_fractions[phases[1]] = g_beta
+
+
+    return eutectic_phase_fractions
 
 # --------------------------------------------------------------------------------
 
@@ -100,7 +104,7 @@ def get_eutectic_lamellar_spacing(mat, phases):
 # https://doi.org/10.1016/j.msea.2022.142928
 # --------------------------------------------------------------------------------
 
-def get_orowan_strengthening_lamella(mat, matrix_phase, secondary_phase):
+def get_orowan_strengthening_lamella(mat, matrix_phase, secondary_phase, eutectic_spacing, phase_fractions):
     # First, get the material properties
 
     # Taylor factor
@@ -115,17 +119,14 @@ def get_orowan_strengthening_lamella(mat, matrix_phase, secondary_phase):
     # Poisson ratio
     poisson_ratio = mat.phase_properties[matrix_phase].properties['poisson_ratio_base_element'].value
 
-    # Eutectic spacing
-    eutectic_spacing = mat.solidification_microstructure['eutectic_lamellar_spacing'].value
-
-    # Secondary phase fraction
-    g_secondary = mat.solidification_microstructure['phase_fractions'][secondary_phase].value
+    # Calculate the secondary phase fraction
+    g_secondary = phase_fractions[secondary_phase]
 
     # Now calculate the effective radius of the secondary phase
     R = eutectic_spacing / (np.sqrt(3.0 * np.pi / (4.0 * g_secondary) - 1.64))
 
     # Finally calculate the strengthening
-    orowan_strengthening_lamella = M * 0.4 * G * b / (np.pi * np.sqrt(1-poisson_ratio)) * np.log(2.0*R/b) / eutectic_spacing
+    orowan_strengthening_lamella = M * 0.4 * G * b / (np.pi * np.sqrt(1.0-poisson_ratio)) * np.log(2.0*R/b) / eutectic_spacing
 
     return orowan_strengthening_lamella
 
@@ -180,17 +181,14 @@ def get_solid_solution_strengthening(mat, matrix_phase):
 # mechanisms in a heat-treated additively manufactured Al–Cu–Mn–Zr alloy. Mater. Sci. Eng. A, 840, 142928 (2022). 
 # https://doi.org/10.1016/j.msea.2022.142928
 # --------------------------------------------------------------------------------
-def get_grain_boundary_strengthening(mat):
+def get_grain_boundary_strengthening(mat, grain_diameter):
     # First, get the material properties
 
     # Hall-Petch coefficient
     k_HP = mat.properties['hall_petch_coefficient'].value
 
-    # Average grain diameter
-    d = mat.grain_microstructure['average_grain_diameter'].value
-
     # Now calculate the grain boundary strengthening
-    gb_strengthening = k_HP / np.sqrt(d)
+    gb_strengthening = k_HP / np.sqrt(grain_diameter)
 
     return gb_strengthening
 # --------------------------------------------------------------------------------
