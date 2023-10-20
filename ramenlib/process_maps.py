@@ -107,12 +107,15 @@ class ProcessMap2D:
         if (len(self.legend_handles) > 0):
             self.ax.legend(handles=self.legend_handles, loc="best")
         if (fixed_show_time == None):
-            #plt.colorbar()
             plt.show()
         else:
             timer = self.fig.canvas.new_timer(interval = fixed_show_time*1000.0)
             timer.add_callback(plt.close)
             timer.start()
             plt.show()
+
+    def save_figure(self, filename):
+        self.fig.savefig(filename, dpi=300)
+
 
 

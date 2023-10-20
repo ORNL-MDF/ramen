@@ -78,3 +78,5 @@ pmap.add_point_data_region(sim_data, [get_depth], lack_of_fusion_classifier, x_n
 #pmap.add_point_data_locations(sim_data, x_name="2", y_name="1")
 
 pmap.finalize()
+pmap.save_figure("acmz_process_map.png")
+
