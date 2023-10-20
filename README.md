@@ -31,4 +31,5 @@ To run the process mapping calculation for ACMZ, run:
 $ python acmz_process_map.py
 ```
 The output process map from that second example is:
+
 ![Example](examples/acmz_process_map.png){width=600}
