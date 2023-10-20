@@ -19,12 +19,12 @@ def test_func1(data):
 
 # Classification function for gridded data, Z
 def test_func2(Z, i, j):
-    var = Z[0]
+    var = Z[0][i,j]
 
-    if var[i,j] > 150.0:
-        return True
-    else:
+    if var > 150.0:
         return False
+    else:
+        return True
 
 # Quantity of interest function for point data, data
 def test_func3(data):
@@ -34,24 +34,23 @@ def test_func3(data):
 def test_func4(Z, i, j):
     spot_size = 55
 
-    var = Z[0]
-    depth = var[i,j]
+    var = Z[0][i,j]
+    depth = var
     if depth/spot_size < 2.0:
-        return True
-    else:
         return False
+    else:
+        return True
     
 # Classification function for gridded data for lack of fusion
 def test_func5(Z, i, j):
     layer_thickness = 30
 
-    var = Z[0]
-    depth = var[i,j]
+    var = Z[0][i,j]
+    depth = var
     if depth > layer_thickness:
-        return True
-    else:
         return False
-
+    else:
+        return True
 
 
 class TestSuite(unittest.TestCase):
@@ -67,8 +66,7 @@ class TestSuite(unittest.TestCase):
 
         pmap = ramen.ProcessMap2D(num_grid_points=[mesh_size, mesh_size], grid_bounds_x=grid_bounds_x, grid_bounds_y=grid_bounds_y)
         pmap.add_point_data_plot(data, test_func1, x_name="2", y_name="1")
-        #pmap.finalize(5.0)
-        pmap.finalize()
+        pmap.finalize(1.0)
 
     def test_grid_data_plot(self):
         print("Test: test_grid_data_plot")
@@ -78,13 +76,11 @@ class TestSuite(unittest.TestCase):
         pmap = ramen.ProcessMap2D(num_grid_points=[mesh_size,mesh_size], grid_bounds_x=grid_bounds_x, grid_bounds_y=grid_bounds_y)
 
         Z = np.zeros([mesh_size, mesh_size])
-        for i in range(0, mesh_size):
-            for j in range(0, mesh_size):
-                Z[i,j] = pmap.X[i,j] + pmap.Y[i,j]**2
+        Z = pmap.X + pmap.Y**2
+
 
         pmap.add_gridded_data_plot(Z)
-        #pmap.finalize(5.0)
-        pmap.finalize()
+        pmap.finalize(1.0)
 
     def test_grid_data_region_plot(self):
         print("Test: test_grid_data_region_plot")
@@ -96,13 +92,12 @@ class TestSuite(unittest.TestCase):
         pmap = ramen.ProcessMap2D(num_grid_points=[mesh_size, mesh_size], grid_bounds_x=grid_bounds_x, grid_bounds_y=grid_bounds_y)
         
         Z = np.zeros([mesh_size, mesh_size])
-        for i in range(0, mesh_size):
-            for j in range(0, mesh_size):
-                Z[i,j] = pmap.Y[i,j] + pmap.X[i,j]**2
+        Z = pmap.Y + pmap.X**2
+
         
         pmap.add_gridded_region([Z], test_func2)
 
-        pmap.finalize()
+        pmap.finalize(1.0)
     
     def test_point_data_region_plot(self):
         print("Test: test_point_data_region_plot")
@@ -115,7 +110,7 @@ class TestSuite(unittest.TestCase):
 
         pmap.add_point_data_region(data, [test_func3], test_func4, x_name="2", y_name="1")
 
-        pmap.finalize()
+        pmap.finalize(1.0)
 
     def test_full_process_map(self):
         print("Test: test_full_process_map")
@@ -127,15 +122,13 @@ class TestSuite(unittest.TestCase):
         pmap = ramen.ProcessMap2D(num_grid_points=[mesh_size, mesh_size], grid_bounds_x=grid_bounds_x, grid_bounds_y=grid_bounds_y)
 
         Z = np.zeros([mesh_size, mesh_size])
-        for i in range(0, mesh_size):
-            for j in range(0, mesh_size):
-                Z[i,j] = pmap.X[i,j] + pmap.Y[i,j]**2
+        Z = pmap.X + pmap.Y**2
 
         pmap.add_gridded_data_plot(Z)
         pmap.add_point_data_region(data, [test_func3], test_func4, x_name="2", y_name="1")
         pmap.add_point_data_region(data, [test_func3], test_func5, x_name="2", y_name="1")
 
-        pmap.finalize()
+        pmap.finalize(1.0)
 
 
 if __name__ == '__main__':

@@ -86,9 +86,10 @@ class ProcessMap2D:
 
         for i in range(0,self.num_grid_points[0]):
             for j in range(0,self.num_grid_points[1]):
-                classification[i,j] = classifier_func(Z_collection, i, j)
+                # I'm not quite sure why I have to flip this
+                classification[i,j] = not classifier_func(Z_collection, i, j)
 
-        cmap = ListedColormap(['white', region_color])
+        cmap = ListedColormap(['w', region_color])
         self.ax.contourf(self.X, self.Y, classification, cmap=cmap, levels=[-0.5,0.5], alpha=1)
 
         if (region_name):
@@ -109,10 +110,9 @@ class ProcessMap2D:
         if (fixed_show_time == None):
             plt.show()
         else:
-            timer = self.fig.canvas.new_timer(interval = fixed_show_time*1000.0)
-            timer.add_callback(plt.close)
-            timer.start()
-            plt.show()
+            plt.show(block=False)
+            plt.pause(fixed_show_time)
+            plt.close()
 
     def save_figure(self, filename):
         self.fig.savefig(filename, dpi=300)

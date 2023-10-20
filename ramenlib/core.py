@@ -193,3 +193,41 @@ def get_grain_boundary_strengthening(mat, grain_diameter):
     return gb_strengthening
 # --------------------------------------------------------------------------------
 
+# --------------------------------------------------------------------------------
+# Keyhole classification
+# Model taken from: 
+# John Coleman, ORNL (origin unknown beyond that)
+# --------------------------------------------------------------------------------
+def keyhole_porosity_classifier(depth, spot_size):
+    if depth/spot_size < 2.0:
+        # Keyholing expected
+        return False
+    else:
+        # No keyholing expected
+        return True
+# --------------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------------
+# Lack-of-fusion porosity classification
+# Model taken from: 
+# John Coleman, ORNL (origin unknown beyond that)
+# --------------------------------------------------------------------------------
+def lack_of_fusion_porosity_classifier(depth, layer_thickness):
+    if depth > layer_thickness:
+        # No lack-of-fusion porosity expected
+        return False
+    else:
+        # Lack-of-fusion porosity expected
+        return True
+# --------------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------------
+# NaN classification
+# Model taken from: 
+# N/A
+# --------------------------------------------------------------------------------
+def nan_classifier(value):
+    return np.isnan(value)
+# --------------------------------------------------------------------------------
+
+
