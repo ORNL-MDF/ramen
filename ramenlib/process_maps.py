@@ -65,17 +65,17 @@ class ProcessMap2D:
         self.legend_handles.append(legend_entry)
 
 
-    def add_point_data_region(self, data, func_list, classifier_func, x_name, y_name, interpolator='linear', region_name=None, color=None):
+    def add_point_data_region(self, data, func_list, classifier_func, x_name, y_name, interpolator='linear', region_name=None, color=None, alpha=1):
         Z_collection = []
         for func in func_list:
             Z = self.interpolate_point_data_to_grid(data, func, x_name, y_name, interpolator)
             Z_collection.append(Z)
 
         # Number of regions is incremented in `add_gridded_region`
-        self.add_gridded_region(Z_collection, classifier_func, region_name, color)
+        self.add_gridded_region(Z_collection, classifier_func, region_name, color, alpha)
 
 
-    def add_gridded_region(self, Z_collection, classifier_func, region_name=None, color=None):
+    def add_gridded_region(self, Z_collection, classifier_func, region_name=None, color=None, alpha=1):
         classification = np.zeros(self.num_grid_points)
 
         region_color = None
@@ -90,10 +90,12 @@ class ProcessMap2D:
                 classification[i,j] = not classifier_func(Z_collection, i, j)
 
         cmap = ListedColormap(['w', region_color])
-        self.ax.contourf(self.X, self.Y, classification, cmap=cmap, levels=[-0.5,0.5], alpha=1)
+        self.ax.contourf(self.X, self.Y, classification, cmap=cmap, levels=[-0.5,0.5], alpha=alpha)
+
+        print('alpha is', alpha)
 
         if (region_name):
-            legend_entry = mpatches.Patch(color=region_color, label=region_name)
+            legend_entry = mpatches.Patch(color=region_color, label=region_name, alpha=alpha)
             self.legend_handles.append(legend_entry)
 
         self.num_regions = self.num_regions + 1
