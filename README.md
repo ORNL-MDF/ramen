@@ -30,4 +30,4 @@ $ python acmz_process_map.py
 ```
 The output process map from that second example is:
 
-![Example](examples/acmz_process_map.png){width=600}
+![Example](examples/acmz_process_map.png)
