@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/771691685.svg)](https://zenodo.org/doi/10.5281/zenodo.10815358)
 # Ramen: Rapid Alloy Models for Enhanced desigN
 Ramen is a Python library for inexpensive analytic and semi-analytic models for process-structure-property calculations for alloys. Ramen also includes plotting tools for creating process maps. It uses [Mist](https://github.com/ORNL-MDF/mist) as the underlying data structure for inputs.
 
