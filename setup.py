@@ -1,4 +1,11 @@
+import os
 from setuptools import setup
+
+path = os.path.dirname(os.path.realpath(__file__))
+requirement_path = os.path.join(path, "requirements.txt")
+requires = []
+with open(requirement_path) as f:
+    requires = f.read().splitlines()
 
 setup(
     name='ramenlib',
@@ -9,9 +16,7 @@ setup(
     author_email='dewittsj@ornl.gov',
     license='ORNL Internal Software - Currently unlicensed',
     packages=['ramenlib'],
-    install_requires=[ 'mistlib',
-                      "numpy"           
-                      ],
+    install_requires=requires,
 
     classifiers=[
         'Development Status :: 1 - Planning',
