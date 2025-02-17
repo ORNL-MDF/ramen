@@ -7,7 +7,7 @@ setup(
     url='https://code.ornl.gov/ramen/ramen',
     author='Stephen DeWitt',
     author_email='dewittsj@ornl.gov',
-    license='ORNL Internal Software - Currently unlicensed',
+    license='BSD-3-Clause',
     packages=['ramenlib'],
     install_requires=[ 'mistlib',
                       "numpy"           
